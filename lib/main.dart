@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'ui/login_page.dart'; // Pastikan Anda mengimpor file halaman login Anda
+import 'ui/LoginScreen.dart'; // Pastikan Anda mengimpor file halaman login Anda
 
 void main() {
   runApp(const MyApp());
@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         useMaterial3: true,
       ),
-      home: const LoginPage(), 
+      home: const LoginScreen(),
     );
   }
 }

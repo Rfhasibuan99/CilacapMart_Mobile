@@ -3,5 +3,6 @@ class ApiUrl {
 
   static const String login = "$baseUrl/login";
   static const String barang = "$baseUrl/barang";
-  static const String tambahBarang = "$baseUrl/barang/tambah";
+  static const String keranjang = "$baseUrl/keranjang";
+  static const String pesanan = "$baseUrl/pesanan";
 }
