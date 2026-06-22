@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'checkout_page.dart';
 
 class KeranjangScreen extends StatefulWidget {
   const KeranjangScreen({super.key});
@@ -68,6 +69,58 @@ class _KeranjangScreenState extends State<KeranjangScreen> {
     });
   }
 
+  Future<void> _updateQty(int idKeranjang, int newQty) async {
+    if (newQty <= 0) {
+      _hapusItem(idKeranjang);
+      return;
+    }
+
+    try {
+      Response response = await Dio().post(
+        'http://localhost:8080/api/keranjang/ubah_qty',
+        data: {
+          'id_keranjang': idKeranjang,
+          'jumlah': newQty,
+        },
+      );
+      if (response.data['status'] == true) {
+        _fetchDataKeranjang();
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(response.data['message'] ?? 'Gagal mengubah jumlah barang.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } catch (e) {
+      print("Error update qty: $e");
+    }
+  }
+
+  Future<void> _hapusItem(int idKeranjang) async {
+    try {
+      Response response = await Dio().post(
+        'http://localhost:8080/api/keranjang/hapus',
+        data: {
+          'id_keranjang': idKeranjang,
+        },
+      );
+      if (response.data['status'] == true) {
+        _fetchDataKeranjang();
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(response.data['message'] ?? 'Gagal menghapus barang.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } catch (e) {
+      print("Error delete cart item: $e");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -123,6 +176,9 @@ class _KeranjangScreenState extends State<KeranjangScreen> {
 
   // Widget untuk desain 1 kotak barang di keranjang
   Widget _buildKeranjangCard(dynamic item) {
+    final int idKeranjang = int.tryParse(item['id_keranjang'].toString()) ?? 0;
+    final int jumlah = int.tryParse(item['jumlah'].toString()) ?? 1;
+
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(12),
@@ -141,14 +197,12 @@ class _KeranjangScreenState extends State<KeranjangScreen> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           // Gambar Barang
-          // Gambar Barang
           Container(
             width: 70,
             height: 70,
             decoration: BoxDecoration(
               color: Colors.grey[200],
               borderRadius: BorderRadius.circular(8),
-              // PERUBAHANNYA DI SINI
               image: item['gambar'] != null && item['gambar'].toString().trim().isNotEmpty
                   ? DecorationImage(
                       image: NetworkImage('http://localhost:8080/api/image/${item['gambar']}'),
@@ -156,7 +210,6 @@ class _KeranjangScreenState extends State<KeranjangScreen> {
                     )
                   : null,
             ),
-            // DAN DI SINI
             child: (item['gambar'] == null || item['gambar'].toString().trim().isEmpty)
                 ? const Icon(Icons.image_not_supported, color: Colors.grey)
                 : null,
@@ -187,25 +240,57 @@ class _KeranjangScreenState extends State<KeranjangScreen> {
             ),
           ),
 
-          // Jumlah Barang (Qty)
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            decoration: BoxDecoration(
-              color: Colors.grey[100],
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.grey.shade300)
-            ),
-            child: Text(
-              'x ${item['jumlah'] ?? 1}',
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-            ),
-          )
+          // Controls (Minus, Qty, Plus, Delete)
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              IconButton(
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+                icon: const Icon(Icons.delete_outline, color: Colors.redAccent, size: 20),
+                onPressed: () => _hapusItem(idKeranjang),
+              ),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  GestureDetector(
+                    onTap: () => _updateQty(idKeranjang, jumlah - 1),
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[200],
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.remove, size: 16, color: Colors.black87),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                    child: Text(
+                      '$jumlah',
+                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () => _updateQty(idKeranjang, jumlah + 1),
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[200],
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.add, size: 16, color: Colors.black87),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ],
       ),
     );
   }
 
-  // Widget Bawah untuk Total Harga dan Checkout
   Widget _buildBottomCheckout() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
@@ -247,13 +332,35 @@ class _KeranjangScreenState extends State<KeranjangScreen> {
             ),
             ElevatedButton(
               onPressed: () {
-                // Nanti tambahkan logika checkout ke sini
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Fitur Checkout belum tersedia')),
-                );
+                final List<Map<String, dynamic>> checkoutItems = [];
+                for (var item in _listKeranjang) {
+                  final double harga = double.tryParse(item['harga_jual'].toString()) ?? 0;
+                  final int jumlah = int.tryParse(item['jumlah'].toString()) ?? 1;
+                  checkoutItems.add({
+                    'id_barang': item['id_barang'],
+                    'id_keranjang': item['id_keranjang'],
+                    'nama_barang': item['nama_barang'],
+                    'harga_jual': harga,
+                    'jumlah': jumlah,
+                    'subtotal': harga * jumlah,
+                    'gambar': item['gambar'],
+                  });
+                }
+
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => CheckoutPage(
+                      checkoutItems: checkoutItems,
+                      totalSubtotal: _totalBelanja,
+                    ),
+                  ),
+                ).then((_) {
+                  _fetchDataKeranjang(); // Refresh cart when returning
+                });
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF325A82), // Warna biru tema
+                backgroundColor: const Color(0xFF325A82),
                 padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),

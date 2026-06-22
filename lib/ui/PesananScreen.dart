@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'invoice_page.dart';
 
 class PesananScreen extends StatefulWidget {
   const PesananScreen({super.key});
@@ -89,7 +90,20 @@ class _PesananScreenState extends State<PesananScreen> {
       itemCount: _listPesanan.length,
       itemBuilder: (context, index) {
         final pesanan = _listPesanan[index];
-        return _buildPesananCard(pesanan);
+        return GestureDetector(
+          onTap: () {
+            final idPesanan = int.tryParse(pesanan['id_pesanan'].toString()) ?? 0;
+            if (idPesanan > 0) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => InvoicePage(idPesanan: idPesanan),
+                ),
+              ).then((_) => _fetchDataPesanan());
+            }
+          },
+          child: _buildPesananCard(pesanan),
+        );
       },
     );
   }

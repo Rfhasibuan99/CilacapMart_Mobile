@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-// Pastikan import ini sesuai dengan nama file dashboard kamu
-import 'DashboardScreen.dart'; 
+import 'main_layout.dart';
+import '../helpers/user_info.dart';
+import '../helpers/session.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -13,16 +14,13 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  // Controller untuk mengambil teks yang diketik user
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   
   bool _isLoading = false;
   bool _obscurePassword = true;
 
-  // Fungsi Login yang sudah diperbaiki sesuai format API CI4 kamu
   Future<void> prosesLogin() async {
-    // Validasi kalau input kosong
     if (_usernameController.text.isEmpty || _passwordController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Username dan Password tidak boleh kosong!')),
@@ -42,17 +40,34 @@ class _LoginScreenState extends State<LoginScreen> {
         }
       );
 
-      // Cek status 1 (berhasil) dari JSON API kamu
       if (response.data['status'] == 1) { 
+        String role = response.data['data']['role'] ?? 'user';
+        if (role.toLowerCase() != 'user') {
+          setState(() { _isLoading = false; });
+          if (!mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Akses ditolak. Aplikasi ini hanya untuk pembeli/user.'),
+              backgroundColor: Colors.red,
+            ),
+          );
+          return;
+        }
+
         int userId = response.data['data']['id']; 
 
-        // Simpan ID user ke penyimpanan lokal HP
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setInt('user_id', userId);
+        await UserInfo().setUserId(userId.toString());
+        await Session.saveUser(
+          userId,
+          response.data['data']['username'] ?? '',
+          response.data['data']['email'] ?? '',
+          role,
+        );
 
         if (!mounted) return;
 
-        // Tampilkan pesan sukses sebentar, lalu pindah ke Dashboard
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(response.data['message'] ?? 'Login Berhasil!'),
@@ -62,11 +77,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => const DashboardScreen()),
+          MaterialPageRoute(builder: (context) => const MainLayout()),
         );
 
       } else {
-        // Jika gagal (status selain 1)
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -93,7 +107,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FA), // Warna senada dengan Dashboard
+      backgroundColor: const Color(0xFFF5F7FA), 
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -152,7 +166,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 16),
 
-                  // Input Password
                   TextField(
                     controller: _passwordController,
                     obscureText: _obscurePassword,
@@ -176,7 +189,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 32),
 
-                  // Tombol Login
                   SizedBox(
                     height: 50,
                     child: ElevatedButton(

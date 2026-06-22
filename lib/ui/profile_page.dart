@@ -1,6 +1,9 @@
-import 'package:cilacap_mart/services/profile_services.dart';
 import 'package:flutter/material.dart';
+import '../../bloc/profile_bloc.dart';
 import '../../models/user_model.dart';
+import 'package:cilacap_mart/ui/main_layout.dart';
+import '../../helpers/session.dart';
+import 'LoginScreen.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
@@ -10,27 +13,19 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  final ProfileService _profileService = ProfileService();
+  final ProfileBloc _profileBloc = ProfileBloc();
   late Future<UserModel> _profileFuture;
 
   @override
   void initState() {
     super.initState();
-    _profileFuture = _profileService.fetchProfileData();
+    _profileFuture = _profileBloc.getProfileData();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xffE8EFF7),
-      appBar: AppBar(
-        backgroundColor: const Color(0xff003366),
-        title: const Text(
-          'Cilacap Mart',
-          style: TextStyle(color: Colors.white),
-        ),
-        elevation: 0,
-      ),
       body: FutureBuilder<UserModel>(
         future: _profileFuture,
         builder: (context, snapshot) {
@@ -45,7 +40,6 @@ class _ProfilePageState extends State<ProfilePage> {
           final user = snapshot.data!;
           return LayoutBuilder(
             builder: (context, constraints) {
-              // Jika layar lebar (Web/Tablet), tampilkan Sidebar & Konten bersebelahan
               if (constraints.maxWidth > 768) {
                 return Padding(
                   padding: const EdgeInsets.all(30.0),
@@ -59,7 +53,6 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                 );
               }
-              // Jika layar HP, tampilkan vertikal ke bawah (Scrollable)
               return SingleChildScrollView(
                 padding: const EdgeInsets.all(15.0),
                 child: Column(
@@ -112,7 +105,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       overflow: TextOverflow.ellipsis,
                     ),
                     GestureDetector(
-                      onTap: () {}, // Aksi ubah foto profil
+                      onTap: () {},
                       child: const Text(
                         'Ubah Foto Profil',
                         style: TextStyle(
@@ -135,19 +128,40 @@ class _ProfilePageState extends State<ProfilePage> {
             isSelected: true,
             onTap: () {},
           ),
-          _buildMenuItem(Icons.shopping_bag, "Pesanan Saya", onTap: () {}),
-          _buildMenuItem(Icons.notifications, "Notifikasi", onTap: () {}),
+          _buildMenuItem(
+            Icons.shopping_bag,
+            "Pesanan Saya",
+            onTap: () {
+              LayoutUpdateNotification(1).dispatch(context);
+            },
+          ),
+          _buildMenuItem(
+            Icons.notifications,
+            "Notifikasi",
+            onTap: () {},
+          ),
           _buildMenuItem(
             Icons.shopping_cart,
             "Keranjang Saya",
             iconColor: const Color(0xfff5c400),
-            onTap: () {},
+            onTap: () {
+              LayoutUpdateNotification(2).dispatch(context);
+            },
           ),
           _buildMenuItem(
             Icons.logout,
             "Logout",
             iconColor: Colors.red,
-            onTap: () {},
+            onTap: () async {
+              await Session.logout();
+              if (mounted) {
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (context) => const LoginScreen()),
+                  (route) => false,
+                );
+              }
+            },
           ),
         ],
       ),
@@ -204,8 +218,8 @@ class _ProfilePageState extends State<ProfilePage> {
               CircleAvatar(
                 radius: 50,
                 backgroundColor: const Color(0xffBBDEFB),
-                backgroundImage: user.gambar != null
-                    ? NetworkImage('http://127.0.0.1:8080/img/${user.gambar}')
+                backgroundImage: user.gambar != null && user.gambar!.isNotEmpty
+                    ? NetworkImage('http://localhost:8080/img/${user.gambar}')
                     : const NetworkImage('https://via.placeholder.com/100'),
               ),
               const SizedBox(height: 10),
@@ -248,7 +262,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
-                  onPressed: () {}, // Aksi navigasi ke halaman ubah akun
+                  onPressed: () {},
                   child: const Text(
                     'Ubah Profil',
                     style: TextStyle(
@@ -285,7 +299,7 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
           Expanded(
             child: Text(
-              value,
+              value.isEmpty ? '-' : value,
               textAlign: TextAlign.end,
               style: const TextStyle(
                 color: Colors.black,
