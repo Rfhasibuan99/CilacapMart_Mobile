@@ -217,7 +217,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.grey.withOpacity(0.2)),
+          border: Border.all(color: Colors.grey.withValues(alpha: 0.2)),
         ),
         child: Padding(
           padding: const EdgeInsets.all(10.0),
@@ -359,7 +359,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           child: Container(
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              color: Colors.black.withOpacity(0.4),
+                              color: Colors.black.withValues(alpha: 0.4),
                             ),
                             child: const Center(
                               child: Icon(Icons.check, color: Colors.white, size: 28),
@@ -422,7 +422,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // ── Gambar barang di atas (mirip <img class="card-img-top">)
               Expanded(
                 flex: 6,
                 child: imgUrl.isNotEmpty
@@ -447,7 +446,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       ),
               ),
 
-              // ── Card body: nama + harga, seluruhnya bisa diklik (mirip <button class="card-body ...">)
               Expanded(
                 flex: 4,
                 child: Material(

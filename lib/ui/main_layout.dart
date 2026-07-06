@@ -5,7 +5,7 @@ import 'PesananScreen.dart';
 import 'KeranjangScreen.dart';
 
 class MainLayout extends StatefulWidget {
-  const MainLayout({Key? key}) : super(key: key);
+  const MainLayout({super.key});
 
   @override
   State<MainLayout> createState() => _MainLayoutState();
@@ -94,7 +94,7 @@ class _MainLayoutState extends State<MainLayout> {
           type: BottomNavigationBarType.fixed,
           backgroundColor: navyBlue,
           selectedItemColor: lightBlue,
-          unselectedItemColor: Colors.white.withOpacity(0.65),
+          unselectedItemColor: Colors.white.withValues(alpha: 0.65),
           showUnselectedLabels: true,
           selectedLabelStyle: const TextStyle(
             fontWeight: FontWeight.bold,

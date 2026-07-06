@@ -7,11 +7,11 @@ class KeranjangBloc {
   
   static Future<List<KeranjangModel>> getKeranjang() async {
     try {
-      // Ambil user_id dari sesi login 
+      
       SharedPreferences prefs = await SharedPreferences.getInstance();
       int? userId = prefs.getInt('user_id');
 
-      // Kalau belum login, kembalikan list kosong
+      
       if (userId == null) {
         print("Silakan login terlebih dahulu.");
         return []; 
@@ -42,6 +42,5 @@ class KeranjangBloc {
     }
   }
 
-  // --- Nanti fitur Tambah/Hapus Keranjang bisa ditaruh di bawah sini ---
 
 }

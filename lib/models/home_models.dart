@@ -6,7 +6,7 @@ class HomeResponse {
   HomeResponse({required this.status, required this.message, required this.data});
 
   factory HomeResponse.fromJson(Map<String, dynamic> json) {
-    // --- AMANKAN PROPERTI STATUS DI SINI ---
+    
     final rawStatus = json['status'];
     bool parsedStatus = false;
 
@@ -17,7 +17,7 @@ class HomeResponse {
     } else if (rawStatus is int) {
       parsedStatus = rawStatus == 1 || rawStatus == 200;
     }
-    // ---------------------------------------
+    
 
     return HomeResponse(
       status: parsedStatus,

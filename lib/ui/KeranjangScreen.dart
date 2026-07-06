@@ -21,10 +21,8 @@ class _KeranjangScreenState extends State<KeranjangScreen> {
     _fetchDataKeranjang();
   }
 
-  // Fungsi untuk mengambil data keranjang dari API
   Future<void> _fetchDataKeranjang() async {
     try {
-      // 1. Ambil user_id dari sesi login yang tersimpan di HP
       SharedPreferences prefs = await SharedPreferences.getInstance();
       int? userId = prefs.getInt('user_id');
 
@@ -34,7 +32,7 @@ class _KeranjangScreenState extends State<KeranjangScreen> {
         return;
       }
 
-      // 2. Tembak ke API CI4, kirim user_id
+      
       Response response = await Dio().get(
         'http://localhost:8080/api/keranjang',
         queryParameters: {'user_id': userId},
@@ -43,7 +41,7 @@ class _KeranjangScreenState extends State<KeranjangScreen> {
       setState(() {
         if (response.data['status'] == 'success') {
           _listKeranjang = response.data['data'];
-          _hitungTotal(); // Panggil fungsi hitung total setelah data didapat
+          _hitungTotal(); 
         }
         _isLoading = false;
       });
@@ -55,11 +53,10 @@ class _KeranjangScreenState extends State<KeranjangScreen> {
     }
   }
 
-  // Fungsi untuk menghitung total harga semua barang di keranjang
+  
   void _hitungTotal() {
     double total = 0;
     for (var item in _listKeranjang) {
-      // Pastikan tipe datanya angka saat dikali
       double harga = double.tryParse(item['harga_jual'].toString()) ?? 0;
       int jumlah = int.tryParse(item['jumlah'].toString()) ?? 1;
       total += (harga * jumlah);
@@ -136,7 +133,6 @@ class _KeranjangScreenState extends State<KeranjangScreen> {
       ),
       body: _buildBody(),
       
-      // Bagian Bawah: Total Harga & Tombol Checkout
       bottomNavigationBar: _listKeranjang.isNotEmpty && !_isLoading 
           ? _buildBottomCheckout() 
           : const SizedBox.shrink(),
@@ -174,7 +170,6 @@ class _KeranjangScreenState extends State<KeranjangScreen> {
     );
   }
 
-  // Widget untuk desain 1 kotak barang di keranjang
   Widget _buildKeranjangCard(dynamic item) {
     final int idKeranjang = int.tryParse(item['id_keranjang'].toString()) ?? 0;
     final int jumlah = int.tryParse(item['jumlah'].toString()) ?? 1;
@@ -187,7 +182,7 @@ class _KeranjangScreenState extends State<KeranjangScreen> {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 8,
             offset: const Offset(0, 4),
           )
@@ -216,7 +211,6 @@ class _KeranjangScreenState extends State<KeranjangScreen> {
           ),
           const SizedBox(width: 16),
 
-          // Detail Barang (Nama & Harga)
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -240,7 +234,6 @@ class _KeranjangScreenState extends State<KeranjangScreen> {
             ),
           ),
 
-          // Controls (Minus, Qty, Plus, Delete)
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
@@ -298,7 +291,7 @@ class _KeranjangScreenState extends State<KeranjangScreen> {
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, -5),
           )
@@ -356,7 +349,7 @@ class _KeranjangScreenState extends State<KeranjangScreen> {
                     ),
                   ),
                 ).then((_) {
-                  _fetchDataKeranjang(); // Refresh cart when returning
+                  _fetchDataKeranjang();
                 });
               },
               style: ElevatedButton.styleFrom(

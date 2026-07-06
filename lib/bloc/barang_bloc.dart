@@ -3,7 +3,7 @@ import '../models/barang_model.dart';
 
 class BarangBloc {
   
-  // Fungsi untuk mengambil list barang
+  
   static Future<List<BarangModel>> getBarang() async {
     String apiUrl = 'http://localhost:8080/api/barang';
 

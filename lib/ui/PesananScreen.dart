@@ -22,17 +22,17 @@ class _PesananScreenState extends State<PesananScreen> {
 
   Future<void> _fetchDataPesanan() async {
     try {
-      // 1. Ambil user_id dari sesi login yang tersimpan di HP
+      
       SharedPreferences prefs = await SharedPreferences.getInstance();
       int? userId = prefs.getInt('user_id');
 
-      // Kalau belum login atau nggak ada ID-nya, set loading false dan selesai
+      
       if (userId == null) {
         setState(() { _isLoadingPesanan = false; });
         return;
       }
 
-      // 2. Tembak ke API CI4, kirim user_id lewat query parameter
+      
       Response response = await Dio().get(
         'http://localhost:8080/api/pesanan',
         queryParameters: {'user_id': userId},
@@ -116,7 +116,7 @@ class _PesananScreenState extends State<PesananScreen> {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 8,
             offset: const Offset(0, 4),
           )
@@ -147,7 +147,7 @@ class _PesananScreenState extends State<PesananScreen> {
             ),
             const SizedBox(width: 16),
 
-            // Detail pesanan sebelah gambar
+            
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -162,7 +162,7 @@ class _PesananScreenState extends State<PesananScreen> {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
-                          color: _getStatusColor(pesanan['status']).withOpacity(0.1),
+                          color: _getStatusColor(pesanan['status']).withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: Text(
@@ -200,7 +200,7 @@ class _PesananScreenState extends State<PesananScreen> {
     );
   }
 
-  // Fungsi pengatur warna badge status otomatis
+  
   Color _getStatusColor(String? status) {
     switch (status?.toLowerCase()) {
       case 'selesai':

@@ -8,11 +8,11 @@ class PembayaranPage extends StatefulWidget {
   final double totalHarga;
 
   const PembayaranPage({
-    Key? key,
+    super.key,
     required this.idPesanan,
     required this.kodePesanan,
     required this.totalHarga,
-  }) : super(key: key);
+  });
 
   @override
   State<PembayaranPage> createState() => _PembayaranPageState();
@@ -44,7 +44,7 @@ class _PembayaranPageState extends State<PembayaranPage> {
           ),
         );
 
-        // Redirect back to InvoicePage (it will reload and show updated status)
+        
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -189,7 +189,6 @@ class _PembayaranPageState extends State<PembayaranPage> {
             ),
             const SizedBox(height: 40),
 
-            // Confirmation Button
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(

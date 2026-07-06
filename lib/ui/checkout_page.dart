@@ -9,10 +9,10 @@ class CheckoutPage extends StatefulWidget {
   final double totalSubtotal;
 
   const CheckoutPage({
-    Key? key,
+    super.key,
     required this.checkoutItems,
     required this.totalSubtotal,
-  }) : super(key: key);
+  });
 
   @override
   State<CheckoutPage> createState() => _CheckoutPageState();
@@ -300,7 +300,6 @@ class _CheckoutPageState extends State<CheckoutPage> {
               ),
               const SizedBox(height: 20),
 
-              // Opsi Pengiriman & Pembayaran Section
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -359,7 +358,6 @@ class _CheckoutPageState extends State<CheckoutPage> {
               ),
               const SizedBox(height: 24),
 
-              // Ringkasan Pembayaran
               _buildSectionTitle(Icons.receipt_long, 'Ringkasan Belanja'),
               const SizedBox(height: 8),
               Card(
@@ -380,7 +378,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                   ),
                 ),
               ),
-              const SizedBox(height: 100), // Spacing for bottom button
+              const SizedBox(height: 100),
             ],
           ),
         ),
@@ -391,7 +389,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
           color: Colors.white,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 10,
               offset: const Offset(0, -5),
             ),

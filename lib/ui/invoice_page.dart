@@ -158,7 +158,6 @@ class _InvoicePageState extends State<InvoicePage> {
             ),
             const SizedBox(height: 16),
 
-            // Rincian Pengiriman
             _buildCardTitle('Detail Pengiriman'),
             const SizedBox(height: 8),
             Card(
@@ -249,7 +248,6 @@ class _InvoicePageState extends State<InvoicePage> {
             ),
             const SizedBox(height: 16),
 
-            // Ringkasan Harga
             _buildCardTitle('Ringkasan Pembayaran'),
             const SizedBox(height: 8),
             Card(

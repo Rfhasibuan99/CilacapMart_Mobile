@@ -3,11 +3,10 @@ import 'package:http/http.dart' as http;
 import 'user_info.dart';
 
 class ApiClient {
-  // Samakan baseUrl dengan konfigurasi lokal Flutter Web Anda
-  final String baseUrl = 'http://localhost:8080/api';
+  final String baseUrl = "http://192.168.1.4:8080/api";
 
   Future<Map<String, dynamic>> getProfile() async {
-    // Ambil userId yang disimpan saat proses login berhasil
+    
     String? userId = await UserInfo().getUserId();
     
     if (userId == null || userId.isEmpty) {

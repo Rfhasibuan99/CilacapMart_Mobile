@@ -6,7 +6,6 @@ class ProfileService {
 
   Future<UserModel> fetchProfileData() async {
     try {
-      // Sesuaikan endpoint ini dengan rute API get profile di CI4 Anda
       final response = await _apiClient.getRequest('akun');
       
       if (response.data != null) {

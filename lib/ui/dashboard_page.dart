@@ -196,7 +196,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.grey.withOpacity(0.2)),
+          border: Border.all(color: Colors.grey.withValues(alpha: 0.2)),
         ),
         child: Padding(
           padding: const EdgeInsets.all(10.0),
@@ -341,7 +341,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       ),
               ),
 
-              // ── Card body: nama + harga, seluruhnya bisa diklik (mirip <button class="card-body ...">)
               Expanded(
                 flex: 4,
                 child: Material(

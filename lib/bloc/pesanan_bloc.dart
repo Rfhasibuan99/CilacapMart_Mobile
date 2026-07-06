@@ -4,14 +4,14 @@ import '../models/pesanan_model.dart';
 
 class PesananBloc {
   
-  // Fungsi statis untuk mengambil riwayat pesanan sesuai user
+  
   static Future<List<PesananModel>> getPesanan() async {
     try {
-      // Ambil user_id dari sesi login
+      
       SharedPreferences prefs = await SharedPreferences.getInstance();
       int? userId = prefs.getInt('user_id');
 
-      // Kalau belum login, langsung kembalikan list kosong
+      
       if (userId == null) {
         print("Belum login, tidak bisa mengambil riwayat pesanan.");
         return [];

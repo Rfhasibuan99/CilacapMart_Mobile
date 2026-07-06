@@ -8,7 +8,7 @@ class ProfileBloc {
     try {
       final jsonResponse = await _apiClient.getProfile();
       
-      // Bungkus data JSON response menggunakan UserResponse bentukan dosen Anda
+      
       final userResponse = UserResponse.fromJson(jsonResponse);
 
       if (userResponse.status == 1 && userResponse.data != null) {
